@@ -1,0 +1,31 @@
+version: 1
+applications:
+  - appRoot: backend      # 👈 Folder containing server.js
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+        build:
+          commands:
+            - echo "No frontend build required"
+      artifacts:
+        baseDirectory: .
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+    backend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+        build:
+          commands:
+            - echo "No backend build step"
+    customHeaders:
+      - pattern: '**/*'
+        headers:
+          - key: "Access-Control-Allow-Origin"
+            value: "*"
