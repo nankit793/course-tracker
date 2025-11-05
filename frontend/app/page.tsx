@@ -86,7 +86,9 @@ export default function HomePage() {
           <TopicsTable
             topics={topics}
             loading={topicsLoading}
-            onTopicUpdate={fetchTopics}
+            onTopicUpdate={(updatedTopics) => {
+              setTopics(updatedTopics);
+            }}
           />
         </div>
 

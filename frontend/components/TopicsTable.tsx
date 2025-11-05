@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Topic, api } from "@/lib/api";
 
 interface TopicsTableProps {
   topics: Topic[];
   loading?: boolean;
-  onTopicUpdate?: () => void;
+  onTopicUpdate?: (updatedTopics: Topic[]) => void;
 }
 
 export default function TopicsTable({
@@ -15,9 +15,15 @@ export default function TopicsTable({
   loading,
   onTopicUpdate,
 }: TopicsTableProps) {
+  const [localTopics, setLocalTopics] = useState<Topic[]>(topics);
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set());
   const [updatingStatus, setUpdatingStatus] = useState<Set<string>>(new Set());
   const { user } = useAuth();
+
+  // Update local topics when props change
+  useEffect(() => {
+    setLocalTopics(topics);
+  }, [topics]);
 
   // Get user's status for a subtopic
   const getUserStatus = (subTopic: any): "pending" | "done" => {
@@ -49,14 +55,44 @@ export default function TopicsTable({
     const newStatus = currentStatus === "pending" ? "done" : "pending";
     const statusKey = `${topicId}-${subTopicId}`;
 
+    // Store original state for potential revert
+    const originalTopics = localTopics;
+
+    // Optimistically update the UI
+    const updatedTopics = localTopics.map((topic) => {
+      if (topic._id === topicId) {
+        const updatedSubTopics = topic.subTopics.map((subTopic) => {
+          if (subTopic._id === subTopicId) {
+            return {
+              ...subTopic,
+              userStatus: newStatus,
+            };
+          }
+          return subTopic;
+        });
+        return {
+          ...topic,
+          subTopics: updatedSubTopics,
+        };
+      }
+      return topic;
+    });
+
+    setLocalTopics(updatedTopics as any);
+    if (onTopicUpdate) {
+      onTopicUpdate(updatedTopics as any);
+    }
+
     try {
       setUpdatingStatus((prev) => new Set(prev).add(statusKey));
       await api.updateSubTopicStatus(topicId, subTopicId, newStatus);
-      if (onTopicUpdate) {
-        onTopicUpdate();
-      }
     } catch (error) {
       console.error("Error updating subtopic status:", error);
+      // Revert optimistic update on error
+      setLocalTopics(originalTopics);
+      if (onTopicUpdate) {
+        onTopicUpdate(originalTopics);
+      }
       alert("Failed to update status. Please try again.");
     } finally {
       setUpdatingStatus((prev) => {
@@ -86,7 +122,7 @@ export default function TopicsTable({
     );
   }
 
-  if (topics.length === 0) {
+  if (localTopics.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
         <p>No topics found. Create your first topic!</p>
@@ -115,7 +151,7 @@ export default function TopicsTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {topics.map((topic) => {
+            {localTopics.map((topic) => {
               const isExpanded = expandedTopics.has(topic._id);
               const subTopicsCount = topic.subTopics?.length || 0;
               const topicStatus = getTopicStatus(topic);

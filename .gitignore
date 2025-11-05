@@ -5,7 +5,8 @@ node_modules/
 
 # Testing
 /coverage
-
+frontend/nextjs-app.zip
+frontend/backend-app.zip
 # Production
 /build
 /dist
@@ -41,3 +42,6 @@ out/
 # OS
 Thumbs.db
 
+
+# Local Netlify folder
+.netlify
