@@ -47,7 +47,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
 
   const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://test.eba-r7bifc93.us-east-1.elasticbeanstalk.com/api";
 
   // Check for stored auth on mount
   useEffect(() => {
