@@ -1,6 +1,10 @@
+// In production (Netlify HTTPS), use proxy route to avoid mixed content issues
+// In development, use direct HTTP connection to AWS backend
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://test.eba-r7bifc93.us-east-1.elasticbeanstalk.com/api";
+  (typeof window !== "undefined" && window.location.hostname.includes("netlify")
+    ? "/api/proxy" // Use proxy in production (Netlify)
+    : "http://test.eba-r7bifc93.us-east-1.elasticbeanstalk.com/api"); // Direct HTTP in development
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {

@@ -48,7 +48,7 @@ const topicSchema = new mongoose.Schema(
         difficulty: {
           type: String,
           enum: {
-            values: ["easy", "medium", "hard"],
+            values: ["Beginner", "Intermediate", "Advanced"],
             message: "{VALUE} is not a valid difficulty",
           },
           default: "easy",

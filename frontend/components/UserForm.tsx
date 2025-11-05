@@ -18,8 +18,7 @@ export default function UserForm({ onUserAdded }: UserFormProps) {
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL ||
-    "https://test.eba-r7bifc93.us-east-1.elasticbeanstalk.com/api";
-
+    "http://test.eba-r7bifc93.us-east-1.elasticbeanstalk.com/api"; // Direct HTTP in development
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
