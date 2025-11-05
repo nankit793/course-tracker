@@ -25,9 +25,29 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.log(error);
+      // Ensure CORS headers are set on error response
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+      );
+      res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, X-Requested-With"
+      );
       res.status(401).json({ message: "Not authorized, token failed" });
     }
   } else {
+    // Ensure CORS headers are set on error response
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Requested-With"
+    );
     res.status(401).json({ message: "Not authorized, no token" });
   }
 };
