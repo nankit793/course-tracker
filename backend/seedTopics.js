@@ -4,8 +4,7 @@ require("dotenv").config();
 
 // MongoDB Connection
 const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://nankit793_db_user:6Unrr9pq7vqmac2q@cluster0.sn2gd36.mongodb.net/";
+  "mongodb+srv://nankit793_db_user:6Unrr9pq7vqmac2q@cluster0.sn2gd36.mongodb.net/mernapp?retryWrites=true&w=majority&appName=Cluster0";
 
 // Sample topics data
 const topicsData = [

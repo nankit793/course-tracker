@@ -7,7 +7,7 @@ const app = express();
 
 // ✅ CORS Configuration - Allow all origins with proper headers
 const corsOptions = {
-  origin: "*", // Allow all origins (you can restrict this to your Netlify domain for production)
+  origin: "*", // Allow all origins (works for both development and production)
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   exposedHeaders: ["Content-Type", "Authorization"],
