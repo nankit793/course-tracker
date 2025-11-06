@@ -5,28 +5,20 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ CORS Configuration - Allow all origins with proper headers
-const corsOptions = {
-  origin: "*", // Allow all origins (works for both development and production)
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  exposedHeaders: ["Content-Type", "Authorization"],
-  credentials: false, // Set to true if you need to send cookies
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  maxAge: 86400, // 24 hours - cache preflight requests
-};
+// ✅ CORS Configuration (simple + works in both local & AWS)
+app.use(
+  cors({
+    origin: "*", // Allow all origins (change to your frontend domain in prod)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+);
 
-// Apply CORS middleware first, before all routes
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
-
+// ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+// ✅ MongoDB Connection
 const MONGODB_URI =
   "mongodb+srv://nankit793_db_user:6Unrr9pq7vqmac2q@cluster0.sn2gd36.mongodb.net/mernapp?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -35,19 +27,15 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
-    console.log("✅ Connected to MongoDB");
-  })
-  .catch((error) => {
-    console.error("❌ MongoDB connection error:", error);
-  });
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((error) => console.error("❌ MongoDB connection error:", error));
 
-// Routes
+// ✅ Routes
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/topics", require("./routes/topicRoutes"));
 
-// Health check route
+// ✅ Health Check
 app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
@@ -56,49 +44,27 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Root route
+// ✅ Root Route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to MERN API" });
 });
 
-// Error handling middleware - ensure CORS headers are set on errors
+// ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  // Set CORS headers for error responses
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With"
-  );
-
+  console.error("❌ Error:", err.stack);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
-    error: process.env.NODE_ENV === "development" ? err : {},
   });
 });
 
-// 404 handler - ensure CORS headers are set
+// ✅ 404 Handler
 app.use((req, res) => {
-  // Set CORS headers for 404 responses
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With"
-  );
-
   res.status(404).json({ message: "Route not found" });
 });
 
-const PORT = process.env.PORT || 3001;
-
-app.listen(PORT, () => {
+// ✅ Start Server (AWS requires 0.0.0.0 and process.env.PORT)
+console.log("✅ Starting Express server...");
+const PORT = 3000;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
